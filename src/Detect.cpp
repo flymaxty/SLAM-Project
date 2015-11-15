@@ -5,9 +5,6 @@ Detect::Detect()
 	std::cout << "Init Detect class.......";
 	
 	m_detector = xfeatures2d::SURF::create();
-
-	m_goodMatchMinValue = 0.002;
-	m_goodMatchDistanceTimes = 3;
 	
 	m_kfthreshold = 0.1;
 
@@ -33,15 +30,58 @@ Mat Detect::descriptor_compute(Ptr<xfeatures2d::SURF> det, Mat img, vector<cv::K
 	det->compute(img, kp, tmp);
 	
 	return(tmp);
-}		
+}
+
+bool Detect::getGoodMatches(vector<DMatch>& in_matches, Mat& in_lastKeypoints, Mat& in_keypoints,
+							vector<DMatch>& in_goodMatches)
+{
+	double goodMatchMinValue = 0.002;
+	double goodMatchDistanceTimes = 3;
+
+	//Calcmm_lastkp_lastkpulate closest match
+	double minMatchDis = 9999;
+	size_t minMatchIndex = 0;
+	if(in_matches.size() == 0)
+	{
+		std::cout << "in_matches is empty" << std::endl;
+		return false;
+	}
+
+	for ( size_t i=0; i<in_matches.size(); i++ )
+	{
+		if ( in_matches[i].distance < minMatchDis )
+		{
+			minMatchDis = in_matches[i].distance;
+			minMatchIndex = i;
+		}
+	}
+
+	double maxDistance = std::max(goodMatchDistanceTimes * minMatchDis, goodMatchMinValue);
+	for (size_t i=0; i<in_matches.size(); i++ )
+	{
+		if(in_matches[i].distance <= maxDistance)
+		{
+			in_goodMatches.push_back(in_matches[i]);
+		}
+	}
+
+	if(in_goodMatches.size() == 0)
+	{
+		std::cout << "in_goodMatches is empty" << std::endl;
+		return false;
+	}
+
+	return true;
+}	
 
 vector<DMatch> Detect::img_match(BFMatcher matcher, Mat last, Mat recent)
 {
-	vector<DMatch> tmp;
+	vector<DMatch> tmp, goodMatches;
 	
 	matcher.match(last, recent, tmp);
+	getGoodMatches(tmp, last ,recent, goodMatches);
 	
-	return(tmp);
+	return(goodMatches);
 }
 
 void Detect::surf_show(Mat last, Mat recent, vector<KeyPoint> kpl, vector<KeyPoint> kpr, vector<DMatch> points)
@@ -89,8 +129,8 @@ void Detect::ransac_detect(vector<DMatch>& in_match, FRAME* in_frame, FRAME* in_
 
 	for (uint16_t i=0; i<in_match.size(); i++)
 	{
-		tmpx = in_lastFrame->keyPoints[in_match[i].queryIdx].pt.x;
-		tmpy = in_lastFrame->keyPoints[in_match[i].queryIdx].pt.y;
+		tmpx = in_lastFrame->keyPoints[in_match[i].trainIdx].pt.x;
+		tmpy = in_lastFrame->keyPoints[in_match[i].trainIdx].pt.y;
 		tmpDepth = in_lastFrame->depthImage.ptr<ushort>(tmpy)[tmpx];
 
 		tmpLastPoint3d.z = double(tmpDepth) / scale;
@@ -149,7 +189,7 @@ void Detect::match_process()
 	
 	//surf_show(m_lastFrame->rgbImage, m_frame->rgbImage, m_lastFrame->keyPoints, m_frame->keyPoints, m_matchpoint);
 	std::cout << m_matchpoint.size() << std::endl;
-	if(m_matchpoint.size()>50)
+	if(m_matchpoint.size()>10)
 	{
 		ransac_detect(m_matchpoint, m_lastFrame, m_frame);
 	}
@@ -157,6 +197,8 @@ void Detect::match_process()
 	{
 		std::cout << "m_matchpoint size too small" << std::endl;
 	}
+
+	surf_show(m_frame->rgbImage, m_lastFrame->rgbImage, m_lastFrame->keyPoints, m_frame->keyPoints, m_matchpoint);
 }
 
 void Detect::detect_process(FRAME* in_frame, FRAME* in_lastFrame)

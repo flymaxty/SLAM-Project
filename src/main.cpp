@@ -61,14 +61,14 @@ int main(int argc, char **argv)
 
 		//Get pointcloud
 		pointCloudProcess.pointcloud_generation(*tmpFrame);
-		//pointCloudProcess.showPointCloud(tmpFrame);
+		//pointCloudProcess.showPointCloud(*tmpFrame);
 
 		//Features Detect
 		if(frameList.size() != 0)
 			detect.detect_process(tmpFrame, &frameList[frameList.size()-1]);
 		else
 			std::cout << "frameList is empty!" << std::endl;
-		
+
 		//Save Frame
 		frameList.push_back(*tmpFrame);
 

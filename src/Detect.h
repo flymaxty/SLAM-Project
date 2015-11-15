@@ -26,13 +26,6 @@ class Detect
 		Ptr<xfeatures2d::SURF> m_detector;
 		vector<DMatch> m_matchpoint;
 
-		std::vector<cv::DMatch> m_goodMatches;
-		std::vector<cv::KeyPoint> m_goodObjectKeypoints;
-		std::vector<cv::KeyPoint> m_goodSceneKeypoints;
-		std::vector<cv::Point2f> m_goodScenePoints;
-		double m_goodMatchMinValue;
-		double m_goodMatchDistanceTimes;
-
 		double m_kfthreshold;
 
 		cv::Mat rvec, tvec, inliers;
@@ -45,6 +38,8 @@ class Detect
 		void surf_show(Mat last, Mat recent, vector<KeyPoint> kpl, vector<KeyPoint> kpr, vector<DMatch> points);
 		double normofTransform(Mat nmt_rvec, Mat nmt_tvec );
 		void detect_process(FRAME* in_frame, FRAME* in_lastFrame);
+		bool getGoodMatches(vector<DMatch>& in_matches, Mat& in_lastKeypoints, Mat& in_keypoints,
+									vector<DMatch>& in_goodMatches);
 		void match_process();
 		void ransac_detect(vector<DMatch>& in_match, FRAME* in_frame, FRAME* in_lastFrame);
 };
