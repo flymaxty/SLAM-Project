@@ -1,10 +1,22 @@
+#include <iostream>
+#include <vector>
+
+#include <opencv2/opencv.hpp>
+#include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
+#include <pcl/visualization/pcl_visualizer.h>
+#include <pcl/visualization/cloud_viewer.h>
+
+#include "Kinect_Input.h"
+#include "DataCenter.hpp"
+
 #include "PointCloudProcess.h"
 
 using namespace std;
 using namespace cv;
 using namespace pcl;
 
-PointCloudProcess::PointCloudProcess()
+PointCloudProcess::PointCloudProcess(): viewer("Simple Cloud Viewer")
 {
 	std::cout << "Init PointCloudProcess......";
 
@@ -61,18 +73,10 @@ bool PointCloudProcess::pointcloud_generation(FRAME& in_frame)
 
 bool PointCloudProcess::showPointCloud(FRAME& in_frame)
 {
-	viewer.setWindowName("3D Viewer");
-	PointCloud<pcl::PointXYZRGB>::Ptr g_cloud (new pcl::PointCloud<pcl::PointXYZRGB>);
-	pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgba(g_cloud);
-	viewer.setBackgroundColor (255, 255, 255);
-	viewer.addPointCloud<pcl::PointXYZRGB> (g_cloud, rgba, "sample cloud");
-	viewer.setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "sample cloud");
-	viewer.addCoordinateSystem (2.0);
-
 	PointCloud<pcl::PointXYZRGB>::Ptr tmp = (PointCloud<pcl::PointXYZRGB>::Ptr)&in_frame.pointCloud;
-	//viewer->showCloud(tmp);
-	pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(tmp);
-	viewer.updatePointCloud(tmp, rgb, "sample cloud");
-	viewer.spinOnce (10);
-	cv::waitKey(0);
+	viewer.showCloud(tmp);
+	//pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(tmp);
+	//viewer.updatePointCloud(tmp, rgb, "sample cloud");
+	//viewer.spinOnce (10);
+	//cv::waitKey(0);
 }

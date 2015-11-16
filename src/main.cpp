@@ -1,5 +1,12 @@
 #include <iostream>
-#include "opencv2/opencv.hpp"
+#include <vector>
+
+#include <opencv2/opencv.hpp>
+#include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
+#include <pcl/visualization/pcl_visualizer.h>
+#include <pcl/visualization/cloud_viewer.h>
+
 #include "DataCenter.hpp"
 #include "Kinect_Input.h"
 #include "PointCloudProcess.h"
@@ -14,6 +21,20 @@ std::vector<FRAME> frameList;
 Freenect::Freenect freenect;
 PointCloudProcess pointCloudProcess;
 Detect detect;
+
+void viewerPsycho (pcl::visualization::PCLVisualizer& viewer)
+{
+    static unsigned count = 0;
+    std::stringstream ss;
+    ss << "Once per viewer loop: " << count++;
+    viewer.removeShape ("text", 0);
+    viewer.addText (ss.str(), 200, 300, "text", 0);
+    
+    //FIXME: possible race condition here:
+    //user_data++;
+    //PointCloud<pcl::PointXYZRGB>::Ptr tmp = (PointCloud<pcl::PointXYZRGB>::Ptr)&(frameList[frameList.size()-1].pointCloud);
+    //viewer.updatePointCloud(tmp, "Simple Cloud Viewer");
+}
 
 int main(int argc, char **argv)
 {
@@ -50,6 +71,9 @@ int main(int argc, char **argv)
 	frameList.push_back(*tmpFrame);
 
 	std::cout << "============= Start =============" << std::endl;
+	PointCloud<pcl::PointXYZRGB>::Ptr tmp = (PointCloud<pcl::PointXYZRGB>::Ptr)&(frameList[frameList.size()-1].pointCloud);
+	//pointCloudProcess.viewer.showCloud(tmp);
+	pointCloudProcess.viewer.runOnVisualizationThread (viewerPsycho);
 	while (!die)
 	{
 		tmpFrame = new FRAME;
@@ -61,7 +85,6 @@ int main(int argc, char **argv)
 
 		//Get pointcloud
 		pointCloudProcess.pointcloud_generation(*tmpFrame);
-		//pointCloudProcess.showPointCloud(*tmpFrame);
 
 		//Features Detect
 		if(frameList.size() != 0)

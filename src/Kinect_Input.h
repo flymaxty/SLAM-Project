@@ -1,14 +1,10 @@
-#ifndef KINECT_INPUT_H
-#define KINECT_INPUT_H
+#ifndef __KINECT_INPUT_H__
+#define __KINECT_INPUT_H__
 
-#include <iostream>
 #include <vector>
-#include <pthread.h>
 
-#include "opencv2/opencv.hpp"
-#include "libfreenect/libfreenect.hpp"
-
-using namespace cv;
+#include <opencv2/opencv.hpp>
+#include <libfreenect/libfreenect.hpp>
 
 class myMutex {
 	public:
@@ -45,4 +41,4 @@ private:
 		bool m_new_depth_frame;
 };
 
-#endif
+#endif	/*__KINECT_INPUT_H__*/

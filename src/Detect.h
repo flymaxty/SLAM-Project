@@ -1,14 +1,11 @@
-#ifndef DETECT_H
-#define DETECT_H
+#ifndef __DETECT_H__
+#define __DETECT_H__
 
-#include <iostream>
-#include <string>
 #include <vector> 
 
-#include "opencv2/opencv.hpp"
-#include "opencv2/xfeatures2d.hpp"
+#include <opencv2/opencv.hpp>
+#include <opencv2/xfeatures2d.hpp>
 
-#include "Kinect_Input.h"
 #include "DataCenter.hpp"
 
 using namespace cv;
@@ -43,4 +40,4 @@ class Detect
 		void match_process();
 		void ransac_detect(vector<DMatch>& in_match, FRAME* in_frame, FRAME* in_lastFrame);
 };
-#endif
+#endif /*__DETECT_H__*/

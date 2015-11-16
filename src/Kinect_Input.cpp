@@ -1,3 +1,9 @@
+#include <iostream>
+#include <vector>
+
+#include <opencv2/opencv.hpp>
+#include <libfreenect/libfreenect.hpp>
+
 #include "Kinect_Input.h"
 
 using namespace cv;
@@ -19,8 +25,10 @@ void myMutex::unlock()
 }
 
 KinectInput::KinectInput(freenect_context *_ctx, int _index):
-			Freenect::FreenectDevice(_ctx, _index), m_buffer_depth(FREENECT_DEPTH_11BIT), 
-			m_buffer_rgb(FREENECT_VIDEO_RGB), m_gamma(2048), m_new_rgb_frame(false), 
+			Freenect::FreenectDevice(_ctx, _index),
+			m_buffer_depth(freenect_find_video_mode(FREENECT_RESOLUTION_MEDIUM, FREENECT_VIDEO_RGB).bytes), 
+			m_buffer_rgb(freenect_find_depth_mode(FREENECT_RESOLUTION_MEDIUM, FREENECT_DEPTH_REGISTERED).bytes / 2),
+			m_gamma(2048), m_new_rgb_frame(false), 
 			m_new_depth_frame(false), depthMat(Size(640,480),CV_16UC1), 
 			rgbMat(Size(640,480), CV_8UC3, Scalar(0)), ownMat(Size(640,480),CV_8UC3,Scalar(0))
 {	

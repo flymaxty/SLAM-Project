@@ -1,3 +1,11 @@
+#include <iostream>
+#include <vector>
+
+#include <opencv2/opencv.hpp>
+#include <opencv2/xfeatures2d.hpp>
+
+#include "DataCenter.hpp"
+
 #include "Detect.h"
 
 Detect::Detect()
@@ -121,8 +129,8 @@ void Detect::ransac_detect(vector<DMatch>& in_match, FRAME* in_frame, FRAME* in_
 		tmpDepth = in_frame->depthImage.ptr<ushort>(tmpy)[tmpx];
 
 		pointDepth = double(tmpDepth) / scale;
-		tmpPoint2d.x = (tmpx - cx) * pointDepth / fx;
-		tmpPoint2d.y = (tmpy - cy) * pointDepth / fy;
+		tmpPoint2d.x  = tmpx;	//= (tmpx - cx) * pointDepth / fx;
+		tmpPoint2d.y =  tmpy; //(tmpy - cy) * pointDepth / fy;
 
 		pointCloud.push_back(tmpPoint2d);
 	}
@@ -198,7 +206,7 @@ void Detect::match_process()
 		std::cout << "m_matchpoint size too small" << std::endl;
 	}
 
-	surf_show(m_frame->rgbImage, m_lastFrame->rgbImage, m_lastFrame->keyPoints, m_frame->keyPoints, m_matchpoint);
+	//surf_show(m_frame->rgbImage, m_lastFrame->rgbImage, m_lastFrame->keyPoints, m_frame->keyPoints, m_matchpoint);
 }
 
 void Detect::detect_process(FRAME* in_frame, FRAME* in_lastFrame)
